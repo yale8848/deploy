@@ -49,11 +49,11 @@ execute order: `zipFiles-->uploads-->commands-->deletes`
 
 ## Download
 
-[windows-64](./release/windows-64/deploy.exe)
+[windows-64](https://github.com/yale8848/deploy/blob/master/release/windows-64/deploy.exe?raw=true)
 
-[linux-64](./release/linux-64/deploy)
+[linux-64](https://github.com/yale8848/deploy/blob/master/release/linux-64/deploy.exe?raw=true)
 
-[darwin-64](./release/darwin-64/deploy)
+[darwin-64](https://github.com/yale8848/deploy/blob/master/release/darwin-64/deploy.exe?raw=true)
 
 
 
