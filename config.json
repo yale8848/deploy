@@ -1,0 +1,26 @@
+{
+
+  "concurrency":true,
+  "zipFiles":["dir","file"],
+  "zipName":"zip.zip",
+  "deletes":["",""],
+  "servers":[
+    {
+      "host":"ip1,ip2",
+      "port":22,
+      "user":"root",
+      "password":"xxxxx",
+      "uploads":[
+        {
+          "local":"G:\\tmp\\mylog.txt",
+          "remote":"/home/soft"
+        }
+      ],
+      "commands":[
+        "date","uname","date"
+      ]
+
+    }
+  ]
+
+}
