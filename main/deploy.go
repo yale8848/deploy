@@ -71,9 +71,30 @@ func zip(s config.Config)  {
 	checkError(err)
 }
 func addJob(s config.Server,i int)  {
+
 	sc:=sshclient.NewSSHClient()
 	error:=sc.ConnectTcp(s.Host,s.Port,s.User,s.Password)
 	checkError(error)
+
+	out:=comdOut{
+		host:s.Host,
+	}
+	errw:=comdErr{
+		host:s.Host,
+	}
+
+	for _,cmd := range s.PreCommands{
+		if len(cmd)==0 {
+			continue
+		}
+		err:=sc.Command(cmd,out,errw)
+		if err!=nil {
+			fmt.Println(err)
+		}else{
+			fmt.Println(cmd+" success")
+		}
+	}
+
 	for _,u:=range s.Uploads{
 		(func(up config.ServerUpload) {
 			uf:=filepath.Base(up.Local)
@@ -86,13 +107,11 @@ func addJob(s config.Server,i int)  {
 				})
 		})(u)
 	}
-	out:=comdOut{
-		host:s.Host,
-	}
-	errw:=comdErr{
-		host:s.Host,
-	}
+
 	for _,cmd := range s.Commands{
+		if len(cmd)==0 {
+			continue
+		}
 		err:=sc.Command(cmd,out,errw)
 		if err!=nil {
 			fmt.Println(err)

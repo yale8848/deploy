@@ -14,7 +14,7 @@ deploy -c config.json
 
 config.json
 
-execute order: `zipFiles-->uploads-->commands-->deletes`
+execute order: `zipFiles-->preCommands-->uploads-->commands-->deletes`
 
 ```json
 
@@ -30,6 +30,9 @@ execute order: `zipFiles-->uploads-->commands-->deletes`
       "port":22,
       "user":"root",
       "password":"xxxxx",
+      "preCommands":[
+              ""
+       ],      
       "uploads":[
         {
           "local":"G:\\tmp\\mylog.txt",
@@ -69,6 +72,9 @@ execute order: `zipFiles-->uploads-->commands-->deletes`
       "port":22,
       "user":"root",
       "password":"xxxxx",
+      "preCommands":[
+              ""
+       ],
       "uploads":[
         {
           "local":"C:\\javawebdeploy.war",

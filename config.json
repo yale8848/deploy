@@ -10,6 +10,9 @@
       "port":22,
       "user":"root",
       "password":"xxxxx",
+      "preCommands":[
+        ""
+      ],
       "uploads":[
         {
           "local":"G:\\tmp\\mylog.txt",

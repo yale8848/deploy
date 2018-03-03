@@ -13,6 +13,7 @@ type Server struct {
 
 	Uploads  []ServerUpload `json:"uploads"`
 	Commands []string `json:"commands"`
+	PreCommands []string `json:"preCommands"`
 
 
 }
