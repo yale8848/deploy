@@ -1,19 +1,20 @@
 # Upload files and execute commands with ssh and sftp
 
-## Hot use
+## Execute use
 
-```go
-go get github.com/yale8848/sshclient
+```cmd
+all_build.cmd
 ```
 
+```cmd
 
-```go
-
-sshclient -c config.json
+deploy -c config.json
 
 ```
 
 config.json
+
+execute order: `zipFiles-->uploads-->commands-->deletes`
 
 ```json
 
@@ -22,6 +23,7 @@ config.json
   "concurrency":true,
   "zipFiles":["dir","file"],
   "zipName":"zip.zip",
+  "deletes":["",""],
   "servers":[
     {
       "host":"ip1,ip2",
@@ -43,3 +45,15 @@ config.json
 
 }
 ```
+
+
+## Download
+
+[windows-64](./release/windows-64/deploy.exe)
+
+[linux-64](./release/linux-64/deploy)
+
+[darwin-64](./release/darwin-64/deploy)
+
+
+
