@@ -1,4 +1,4 @@
-# Upload files and execute commands with ssh and sftp
+# Deploy files and execute commands tool
 
 ## Usage
 
