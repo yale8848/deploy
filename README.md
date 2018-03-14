@@ -1,10 +1,6 @@
 # Upload files and execute commands with ssh and sftp
 
-## Execute use
-
-```cmd
-all_build.cmd
-```
+## Usage
 
 ```cmd
 
@@ -23,7 +19,7 @@ execute order: `zipFiles-->preCommands-->uploads-->commands-->deletes`
   "concurrency":true,
   "zipFiles":["dir","file"],
   "zipName":"zip.zip",
-  "deletes":["",""],
+  "deletes":["zip.zip"],
   "servers":[
     {
       "host":"ip1,ip2",
@@ -59,7 +55,7 @@ execute order: `zipFiles-->preCommands-->uploads-->commands-->deletes`
 [darwin-64](https://github.com/yale8848/deploy/blob/master/release/darwin-64/deploy.exe?raw=true)
 
 
-## Upload war demo
+## Upload war file demo
 
 ```json
 
