@@ -21,5 +21,4 @@ type Server struct {
 type Config struct {
 	Concurrency bool `json:"concurrency"`
 	Servers     []Server `json:"servers"`
-	Deletes []string `json:"deletes"`
 }

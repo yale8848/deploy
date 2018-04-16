@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"strings"
-	"gorpool"
-	"github.com/gosuri/uiprogress"
 	"flag"
 	"path/filepath"
 	"os"
@@ -16,7 +14,7 @@ import (
 	"deploy/config"
 	"deploy/sshclient"
 	"strconv"
-	"dxh-xcx/src/common/configs"
+	"github.com/yale8848/gorpool"
 )
 
 type comdOut struct {
@@ -72,29 +70,40 @@ func zip(zipFiles []string,zipName string)  {
 	fmt.Println("[zip] zip "+zipName+" finish")
 	checkError(err)
 }
+
+func deleteFile(f string)  {
+	e:=os.Remove(f)
+	if e==nil {
+		fmt.Println("[delete] delete "+f+" success")
+	}
+}
+func oneCmd(cmd,host string,sc *sshclient.SSHClient )  {
+
+	if len(cmd)==0 {
+		return
+	}
+	out:=comdOut{
+		host:host,
+	}
+	errw:=comdErr{
+		host:host,
+	}
+
+	err:=sc.Command(cmd,out,errw)
+	if err!=nil {
+		fmt.Println(err)
+	}else{
+		fmt.Println(cmd+" success")
+	}
+}
 func addJob(s config.Server,i int)  {
 
 	sc:=sshclient.NewSSHClient()
 	error:=sc.ConnectTcp(s.Host,s.Port,s.User,s.Password)
 	checkError(error)
 
-	out:=comdOut{
-		host:s.Host,
-	}
-	errw:=comdErr{
-		host:s.Host,
-	}
-
 	for _,cmd := range s.PreCommands{
-		if len(cmd)==0 {
-			continue
-		}
-		err:=sc.Command(cmd,out,errw)
-		if err!=nil {
-			fmt.Println(err)
-		}else{
-			fmt.Println(cmd+" success")
-		}
+		oneCmd(cmd,s.Host,sc)
 	}
 
 	for _,u:=range s.Uploads{
@@ -110,20 +119,20 @@ func addJob(s config.Server,i int)  {
 						fmt.Printf("[upload] %s: %s finish\r\n",s.Host,uf)
 					}
 				})
+			remote := up.Remote
+			if remote[len(remote)-1] !='/'{
+				remote =  remote+"/"
+			}
+			cmd:=fmt.Sprintf("unzip -qo %s -d %s",remote+zipName,remote)
+			oneCmd(cmd,s.Host,sc)
+			cmd=fmt.Sprintf("rm -f %s",remote+zipName)
+			oneCmd(cmd,s.Host,sc)
+			deleteFile(zipName)
 		})(u)
 	}
 
-	//c = append(c,"")
 	for _,cmd := range s.Commands{
-		if len(cmd)==0 {
-			continue
-		}
-		err:=sc.Command(cmd,out,errw)
-		if err!=nil {
-			fmt.Println(err)
-		}else{
-			fmt.Println(cmd+" success")
-		}
+		oneCmd(cmd,s.Host,sc)
 	}
 	sc.Close()
 }
@@ -143,14 +152,10 @@ func main()  {
 	if err!=nil {
 		checkError(err)
 	}
-
-
-
 	servers:=getServers(config)
 	if config.Concurrency {
 		pool:=gorpool.NewPool(len(servers),len(servers)).
 			EnableWaitForAll(true).Start()
-		uiprogress.Start()
 		for i,s:=range servers{
 			sss:=s
 			index:=i
@@ -165,14 +170,7 @@ func main()  {
 		}
 	}
 
-	if len(config.Deletes)>0 {
-		for _,d:=range config.Deletes {
-			e:=os.Remove(d)
-			if e==nil {
-				fmt.Println("[remove] remove "+d+" success")
-			}
-		}
-	}
+
 	ct:=time.Now().Sub(startTime).Seconds()
 	fmt.Printf("finish: cost %d m : %d s",int(ct)/60,int(ct)%60)
 
