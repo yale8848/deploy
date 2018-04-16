@@ -1,10 +1,7 @@
 {
 
   "concurrency":true,
-  "zipFiles":["dir","file"],
-  "zipName":"zip.zip",
-  "deletes":["",""],
-  "localCommands":[],
+
   "servers":[
     {
       "host":"ip1,ip2",

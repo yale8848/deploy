@@ -15,6 +15,8 @@ import (
 	"deploy/zip"
 	"deploy/config"
 	"deploy/sshclient"
+	"strconv"
+	"dxh-xcx/src/common/configs"
 )
 
 type comdOut struct {
@@ -52,22 +54,22 @@ func  getServers(c config.Config) []config.Server {
 	return cs
 }
 
-func zip(s config.Config)  {
+func zip(zipFiles []string,zipName string)  {
 
-	if len(s.ZipFiles) == 0 || len(s.ZipName) == 0 {
+	if len(zipFiles) == 0 || len(zipName) == 0 {
 		return
 	}
 	files:=[]*os.File{}
-	for _,z:=range s.ZipFiles  {
+	for _,z:=range zipFiles  {
 		f,e:=os.Open(z)
 		if e!=nil {
 			checkError(e)
 		}
 		files = append(files,f)
 	}
-	fmt.Println("[zip] start zip "+s.ZipName)
-	err:=zipfile.Compress(files,s.ZipName)
-	fmt.Println("[zip] zip "+s.ZipName+" finish")
+	fmt.Println("[zip] start zip "+zipName)
+	err:=zipfile.Compress(files,zipName)
+	fmt.Println("[zip] zip "+zipName+" finish")
 	checkError(err)
 }
 func addJob(s config.Server,i int)  {
@@ -97,8 +99,11 @@ func addJob(s config.Server,i int)  {
 
 	for _,u:=range s.Uploads{
 		(func(up config.ServerUpload) {
-			uf:=filepath.Base(up.Local)
-			sc.Upload(up.Local,up.Remote,
+			t := time.Now()
+			zipName := strconv.FormatInt(t.UTC().UnixNano(), 10)+".zip"
+			zip(up.Local,zipName)
+			uf:=filepath.Base(zipName)
+			sc.Upload(zipName,up.Remote,
 				func( percent int,finish bool) {
 					fmt.Printf("[upload] %s: %s %d%%\r\n",s.Host,uf,percent)
 					if finish {
@@ -108,6 +113,7 @@ func addJob(s config.Server,i int)  {
 		})(u)
 	}
 
+	//c = append(c,"")
 	for _,cmd := range s.Commands{
 		if len(cmd)==0 {
 			continue
@@ -138,7 +144,7 @@ func main()  {
 		checkError(err)
 	}
 
-	zip(config)
+
 
 	servers:=getServers(config)
 	if config.Concurrency {

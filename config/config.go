@@ -2,7 +2,7 @@
 package config
 
 type ServerUpload struct {
-	Local  string `json:"local"`
+	Local  []string `json:"local"`
 	Remote string `json:"remote"`
 }
 type Server struct {
@@ -21,7 +21,5 @@ type Server struct {
 type Config struct {
 	Concurrency bool `json:"concurrency"`
 	Servers     []Server `json:"servers"`
-	ZipFiles []string `json:"zipFiles"`
-	ZipName string `json:"zipName"`
 	Deletes []string `json:"deletes"`
 }
