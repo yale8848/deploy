@@ -1,0 +1,33 @@
+{
+  "concurrency":true,
+  "servers":[
+    {
+      "host":"122.25.36.9,114.25.36.9",
+      "port":22,
+      "user":"root",
+      "password":"",
+      "preCommands":[
+        "mkdir /tmp/deploy-test"
+      ],
+      "uploads":[
+        {
+          "local":["./test","./build.cmd","G:\\tmp\\mylog.txt"],
+          "remote":"/tmp/deploy-test"
+        }
+      ],
+      "commands":[
+       "uname"
+      ],
+      "verify":{
+        "http":"http",
+        "delay":3,
+        "gap":2,
+        "path":":8080/api/appInfo",
+        "count":3,
+        "successStrFlag":"1.10"
+      }
+
+    }
+  ]
+
+}
