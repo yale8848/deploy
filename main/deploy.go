@@ -94,25 +94,6 @@ func getServers(c config.Config) []config.Server {
 	return cs
 }
 
-func zip(zipFiles []string, zipName string) string {
-
-	if len(zipFiles) == 0 || len(zipName) == 0 {
-		return zipName
-	}
-	files := []*os.File{}
-	for _, z := range zipFiles {
-		f, e := os.Open(z)
-		if e != nil {
-			checkError(e)
-		}
-		files = append(files, f)
-	}
-	err := zipfile.Compress(files, zipName)
-	fmt.Println("[zip] zip " + zipName + " finish")
-	checkError(err)
-	return zipName
-}
-
 func deleteFile(f string) {
 	e := os.Remove(f)
 	if e == nil {
@@ -270,8 +251,8 @@ func addJob(s config.Server, i int) {
 
 	for _, u := range s.Uploads {
 		(func(up config.ServerUpload) {
-			zipName := os.Getenv("TMP") + "/dp_tmp_" + strconv.FormatInt(time.Now().UTC().UnixNano(), 10) + ".zip"
-			uploadOne(sc, zip(up.Local, zipName), up.Remote, s)
+			zipName := os.Getenv("TMP") + "/deploy_tmp_" + strconv.FormatInt(time.Now().UTC().UnixNano(), 10) + ".zip"
+			uploadOne(sc, zipfile.ZipFile(up.Local, zipName, up.ZipRegexp), up.Remote, s)
 		})(u)
 	}
 

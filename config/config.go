@@ -2,8 +2,9 @@
 package config
 
 type ServerUpload struct {
-	Local  []string `json:"local"`
-	Remote string   `json:"remote"`
+	Local     []string `json:"local"`
+	Remote    string   `json:"remote"`
+	ZipRegexp []string `json:"zipRegexp"`
 }
 type ServerVerify struct {
 	Path           string `json:"path"`

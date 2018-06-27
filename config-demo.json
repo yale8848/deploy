@@ -12,6 +12,7 @@
       "uploads":[
         {
           "local":["./test","./build.cmd","G:\\tmp\\mylog.txt"],
+          "zipRegexp":["test/bb.txt","ccc$"],
           "remote":"/tmp/deploy-test"
         }
       ],
