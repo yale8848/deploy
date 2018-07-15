@@ -29,7 +29,7 @@ config.json
       ],
       "uploads":[
         {
-          "local":["resource","start.sh","G:\\tmp\\mylog.txt"],
+          "local":["resource","start.sh","G:\\tmp\\mylog.txt","..\\test2"],
           "zipRegexp":["test/bb.txt","ccc$"],
           "remote":"/home/server"
         }
@@ -69,7 +69,7 @@ config.json
       ],
       "uploads":[//上传文件配置
         {
-          "local":["resource","start.sh","G:\\tmp\\mylog.txt"],//本地要上传的目录和文件列表，上传时会打包为一个zip文件；
+          "local":["resource","start.sh","G:\\tmp\\mylog.txt","..\\test2"],//本地要上传的目录和文件列表，上传时会打包为一个zip文件；
           "zipRegexp":["test/bb.txt","ccc$"],//zip打包过滤正则，从local中过滤符合正则条件的文件
           "remote":"/home/server" //要上传的服务器路径
         }
