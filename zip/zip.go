@@ -2,18 +2,62 @@
 package zipfile
 
 import (
-	"io"
 	"archive/zip"
+	"fmt"
+	"io"
 	"os"
+	"regexp"
+	"strings"
+	"deploy/util"
+	"path/filepath"
 )
 
-func Compress(files []*os.File, dest string) error {
+func checkError(e error) {
+	if e != nil {
+		fmt.Println(e)
+		panic(e)
+	}
+}
+func ZipFile(zipFiles []string, zipName string, zipRegexp []string) string {
+
+	if len(zipFiles) == 0 || len(zipName) == 0 {
+		return zipName
+	}
+	files := []*os.File{}
+	var f *os.File
+	var e error
+	for _, z := range zipFiles {
+
+		if strings.HasPrefix(z,"/") || strings.Contains(z,":") {
+			f, e = os.Open(z)
+			checkError(e)
+		}else{
+
+			f, e = os.Open(z)
+			if e!=nil {
+				c,e:=util.GetCurrentPath()
+				checkError(e)
+				z=filepath.Join(c,z)
+			}
+			f, e = os.Open(z)
+			checkError(e)
+		}
+		files = append(files, f)
+	}
+	err := Compress(files, zipRegexp, zipName)
+	fmt.Println("[zip] zip " + zipName + " finish")
+	checkError(err)
+	return zipName
+}
+
+func Compress(files []*os.File, zipRegexp []string, dest string) error {
+
 	d, _ := os.Create(dest)
 	defer d.Close()
 	w := zip.NewWriter(d)
 	defer w.Close()
 	for _, file := range files {
-		err := compress(file, "", w)
+		err := compress(file, "", w, zipRegexp)
 		if err != nil {
 			return err
 		}
@@ -21,11 +65,44 @@ func Compress(files []*os.File, dest string) error {
 	return nil
 }
 
-func compress(file *os.File, prefix string, zw *zip.Writer) error {
+
+func isFilter(file *os.File, zipRegexp []string) bool {
+
+	if len(zipRegexp) == 0 {
+		return false
+	}
+
+	n := file.Name()
+	for _, r := range zipRegexp {
+
+		if len(r) == 0 {
+			continue
+		}
+
+		m, e := regexp.MatchString(r, n)
+		if e != nil {
+			continue
+		}
+		if m {
+			return true
+		}
+
+	}
+	return false
+}
+
+func compress(file *os.File, prefix string, zw *zip.Writer, zipRegexp []string) error {
+
 	info, err := file.Stat()
 	if err != nil {
 		return err
 	}
+
+
+	if isFilter(file, zipRegexp) {
+		return nil
+	}
+
 	if info.IsDir() {
 		prefix = prefix + "/" + info.Name()
 		fileInfos, err := file.Readdir(-1)
@@ -37,7 +114,8 @@ func compress(file *os.File, prefix string, zw *zip.Writer) error {
 			if err != nil {
 				return err
 			}
-			err = compress(f, prefix, zw)
+
+			err = compress(f, prefix, zw, zipRegexp)
 			if err != nil {
 				return err
 			}
@@ -60,5 +138,3 @@ func compress(file *os.File, prefix string, zw *zip.Writer) error {
 	}
 	return nil
 }
-
-

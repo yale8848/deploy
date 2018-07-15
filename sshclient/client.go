@@ -40,7 +40,7 @@ func (s *SSHClient)Connect(network string,host string,port int,user string,passw
 	})
 	if err==nil {
 		s.client = client
-		c, err := sftp.NewClient(client, sftp.MaxPacket(maxMaxPacket))
+		c, err := sftp.NewClient(client)
 		if err == nil {
 			s.sftpClient = c
 			return nil
@@ -105,8 +105,10 @@ func (s *SSHClient)Upload(local string,remoteDir string,callback UploadCallback)
 			break
 		}
 		uploaded+=int64(n)
-		callback(int(uploaded*100/info.Size()),uploaded==info.Size())
+
 		dstFile.Write(buf[0:n])
+		callback(int(uploaded*100/info.Size()),uploaded==info.Size())
+
 	}
 	return nil
 }

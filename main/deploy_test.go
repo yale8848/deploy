@@ -4,8 +4,3 @@ package main
 import (
 	"testing"
 )
-
-func Test_getServer(t * testing.T) {
-	unZip("affasf","")
-	unZip("affasf/","")
-}
