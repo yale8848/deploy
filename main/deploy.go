@@ -2,19 +2,20 @@
 package main
 
 import (
-	"deploy/config"
-	"deploy/sshclient"
-	"deploy/zip"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/yale8848/gorpool"
+	"github.com/panjf2000/ants/v2"
+	"github.com/yale8848/deploy/config"
+	"github.com/yale8848/deploy/sshclient"
+	zipfile "github.com/yale8848/deploy/zip"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -30,12 +31,12 @@ function installUnzip () {
   haveCmd yum
   if [ $? == 1 ]
   then
-    yum -y install unzip
+    sudo yum -y install unzip
   else
     haveCmd apt-get
     if [ $? == 1 ]
     then
-      apt-get -y install unzip
+      sudo apt-get -y install unzip
     else
       echo "[deploy] #### please install unzip in server ####"
     fi
@@ -113,8 +114,11 @@ func oneCmdMsgHide(cmd, host string, sc *sshclient.SSHClient) {
 		host:    host,
 		hideMsg: true,
 	}
-
-	err := sc.Command(cmd, out, errw)
+	tcmd := cmd
+	if !strings.HasPrefix(cmd, "sudo") {
+		tcmd = "sudo " + cmd
+	}
+	err := sc.Command(tcmd, out, errw)
 	if err != nil {
 		fmt.Println(err)
 	} else {
@@ -133,23 +137,31 @@ func oneCmd(cmd, host string, sc *sshclient.SSHClient) {
 		host: host,
 	}
 
-	err := sc.Command(cmd, out, errw)
+	tcmd := cmd
+	if !strings.HasPrefix(cmd, "sudo") {
+		tcmd = "sudo " + cmd
+	}
+
+	err := sc.Command(tcmd, out, errw)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(cmd + " success")
+		fmt.Println(tcmd + " success")
 	}
 }
 
 func uploadOne(sc *sshclient.SSHClient, local, remote string, s config.Server) {
 	uf := filepath.Base(local)
-	sc.Upload(local, remote,
+	err := sc.Upload(local, remote,
 		func(percent int, finish bool) {
 			fmt.Printf("[upload] %s: %s %d%%\r\n", s.Host, uf, percent)
 			if finish {
 				fmt.Printf("[upload] %s: %s finish\r\n", s.Host, uf)
 			}
 		})
+	if err != nil {
+		fmt.Println(err)
+	}
 	if remote[len(remote)-1] != '/' {
 		remote = remote + "/"
 	}
@@ -172,7 +184,7 @@ func uploadSpecial(sc *sshclient.SSHClient, local, remote string, s config.Serve
 		remote = remote + "/"
 	}
 	oneCmdMsgHide("chmod 755 "+remote+uf, s.Host, sc)
-	oneCmdMsgHide("sh "+remote+uf, s.Host, sc)
+	oneCmdMsgHide(remote+uf, s.Host, sc)
 	cmd := fmt.Sprintf("rm -f %s", remote+uf)
 	oneCmdMsgHide(cmd, s.Host, sc)
 	deleteFile(local)
@@ -186,8 +198,8 @@ func installUnzip(sc *sshclient.SSHClient, s config.Server) {
 	}
 	fout.WriteString(INSTALL_UNZIP_SHELL)
 	fout.Close()
-	oneCmdMsgHide("mkdir /home/tmp", s.Host, sc)
-	uploadSpecial(sc, unzipShellName, "/home/tmp", s)
+	oneCmdMsgHide("mkdir /tmp", s.Host, sc)
+	uploadSpecial(sc, unzipShellName, "/tmp", s)
 }
 func httpGet(url string) (string, bool) {
 	resp, err := http.Get(url)
@@ -241,7 +253,7 @@ func verify(s config.Server) verifyResult {
 func addJob(s config.Server, i int) {
 
 	sc := sshclient.NewSSHClient()
-	error := sc.ConnectTcp(s.Host, s.Port, s.User, s.Password)
+	error := sc.ConnectTcp(s.Host, s.Port, s.User, s.Password, s.PrivateKeyPath, s.Socks5UrlPath, s.UserPasswordPath)
 	checkError(error)
 
 	installUnzip(sc, s)
@@ -278,17 +290,27 @@ func main() {
 		checkError(err)
 	}
 	servers := getServers(config)
+
+	var wg sync.WaitGroup
+
 	if config.Concurrency {
-		pool := gorpool.NewPool(len(servers), len(servers)).
-			EnableWaitForAll(true).Start()
+
+		p, _ := ants.NewPool(len(servers))
+		defer p.Release()
+
 		for i, s := range servers {
 			sss := s
 			index := i
-			pool.AddJob(func() {
+			wg.Add(1)
+
+			p.Submit(func() {
 				addJob(sss, index)
+				wg.Done()
 			})
 		}
-		pool.WaitForAll()
+
+		wg.Wait()
+
 	} else {
 		for i, s := range servers {
 			addJob(s, i)

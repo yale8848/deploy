@@ -1,0 +1,1 @@
+SET GOPROXY=https://goproxy.cn,direct && go get github.com/panjf2000/ants/v2@v2.4.1

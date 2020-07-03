@@ -21,6 +21,9 @@ config.json
       "port":22,
       "user":"root",
       "password":"xxxx",
+      "userPasswordPath": "/path/to/usr.password",
+      "socks5UrlPath": "/path/to/socks.url",
+      "privateKeyPath":"/path/to/key.pem",
       "preCommands":[
         "mkdir /home/server"
       ],
@@ -56,9 +59,13 @@ config.json
   "servers":[
     {
       "host":"ip1,ip2",//服务器ip或域名，多个以逗号分隔
-      "port":22,
-      "user":"root",
-      "password":"xxxx",
+      "port":22,//默认22，可以不填
+      "user":"root",//
+      "password":"xxxx",//
+      "userPasswordPath": "usr.password",//可选，有这个文件时可以不填上面的user和password字段；文件内容格式usr@password，
+      "privateKeyPath":"/path/to/key.pem",//私钥路径，可选
+      "socks5UrlPath": "/path/to/socks.url",//socks5代理，可选，文件内容如：socks5://usr:password@ip:port?tcpTimeout=60&tcpDeadline=0&udpDeadline=60
+      "privateKeyPath":"/path/to/key.pem",//私钥地址，可选，如果不想输入密码可以填私钥地址
       "preCommands":[ //上传文件前执行服务器命令
         "mkdir /home/server"
       ],

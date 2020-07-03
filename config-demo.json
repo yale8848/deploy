@@ -2,10 +2,13 @@
   "concurrency":true,
   "servers":[
     {
-      "host":"122.25.36.9,114.25.36.9",
+      "host":"1.1.1.1",
       "port":22,
       "user":"root",
       "password":"",
+      "userPasswordPath": "/path/to/usr.password",
+      "socks5UrlPath": "/path/to/socks.url",
+      "privateKeyPath":"/path/to/key.pem",
       "preCommands":[
         "mkdir /tmp/deploy-test"
       ],
