@@ -52,7 +52,6 @@ config.json
 ```
 
 配置介绍：
-
 ```
 {
   "concurrency":true, //是否并发执行，默认false
