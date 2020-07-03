@@ -8,6 +8,7 @@ import (
 	"github.com/panjf2000/ants/v2"
 	"github.com/yale8848/deploy/config"
 	"github.com/yale8848/deploy/sshclient"
+	"github.com/yale8848/deploy/util"
 	zipfile "github.com/yale8848/deploy/zip"
 	"io/ioutil"
 	"net/http"
@@ -280,11 +281,20 @@ func main() {
 	configJson := flag.String("c", "config.json", "-c config.json")
 	flag.Parse()
 	configPath, _ := filepath.Abs(*configJson)
-	config := config.Config{}
+	exs, err := util.PathExists(configPath)
+	checkError(err)
+	if !exs {
+		p, err := util.GetCurrentPath()
+		checkError(err)
+		configPath = filepath.Join(p, *configJson)
+
+	}
 	dat, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		checkError(err)
 	}
+
+	config := config.Config{}
 	err = json.Unmarshal(dat, &config)
 	if err != nil {
 		checkError(err)

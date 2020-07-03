@@ -15,6 +15,7 @@ type ServerVerify struct {
 	Http           string `json:"http"`
 }
 
+
 type Server struct {
 	Host             string `json:"host"`
 	Port             int    `json:"port"`
@@ -23,6 +24,7 @@ type Server struct {
 	UserPasswordPath string `json:"userPasswordPath"`
 	PrivateKeyPath   string `json:"privateKeyPath"`
 	Socks5UrlPath    string `json:"socks5UrlPath"`
+
 
 	Uploads     []ServerUpload `json:"uploads"`
 	Commands    []string       `json:"commands"`

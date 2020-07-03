@@ -1,6 +1,8 @@
+
 # 通过SSH连接，简单的配置文件，让部署更简单
 
 ## 用法
+
 
 ```cmd
 
@@ -9,6 +11,7 @@ deploy -c config.json
 ```
 
 config.json
+
 
 配置执行顺序: `preCommands-->uploads-->commands-->verify`
 
@@ -29,7 +32,7 @@ config.json
       ],
       "uploads":[
         {
-          "local":["resource","start.sh","G:\\tmp\\mylog.txt"],
+          "local":["resource","start.sh","G:\\tmp\\mylog.txt","..\\test2"],
           "zipRegexp":["test/bb.txt","ccc$"],
           "remote":"/home/server"
         }
@@ -45,11 +48,13 @@ config.json
            "count":3,
            "successStrFlag":"1.10"
       }
+
     }
   ]
 
 }
 ```
+
 
 配置介绍：
 ```
@@ -70,7 +75,7 @@ config.json
       ],
       "uploads":[//上传文件配置
         {
-          "local":["resource","start.sh","G:\\tmp\\mylog.txt"],//本地要上传的目录和文件列表，上传时会打包为一个zip文件；上传文件路径为执行deploy命令目录的相对路径或者绝对路径
+          "local":["resource","start.sh","G:\\tmp\\mylog.txt","..\\test2"],//本地要上传的目录和文件列表，上传时会打包为一个zip文件；
           "zipRegexp":["test/bb.txt","ccc$"],//zip打包过滤正则，从local中过滤符合正则条件的文件
           "remote":"/home/server" //要上传的服务器路径
         }
@@ -93,6 +98,7 @@ config.json
 ```
 ## 下载
 
+
 [windows-64](https://github.com/yale8848/deploy/blob/master/release/windows-64/deploy.exe?raw=true)
 
 [linux-64](https://github.com/yale8848/deploy/blob/master/release/linux-64/deploy.exe?raw=true)
@@ -100,7 +106,9 @@ config.json
 [darwin-64](https://github.com/yale8848/deploy/blob/master/release/darwin-64/deploy.exe?raw=true)
 
 
+
 ## 上传war包例子
+
 
 ```json
 
@@ -118,7 +126,9 @@ config.json
        ],
       "uploads":[
         {
+
           "local":["target\\javawebdeploy.war"],
+
           "remote":"/coder/tomcat/apache-tomcat-7.0.55/webapps"
         }
       ],
@@ -126,11 +136,13 @@ config.json
         "sh /coder/tomcat/apache-tomcat-7.0.55/bin/shutdown.sh",
         "rm -rf /coder/tomcat/apache-tomcat-7.0.55/webapps/javawebdeploy",
         "sh /coder/tomcat/apache-tomcat-7.0.55/bin/startup.sh"
+
       ],
       "verify":{
           "path":":8080/api/info",
           "successStrFlag":"1.10"
        }
+
     }
   ]
 
