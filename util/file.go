@@ -1,11 +1,12 @@
 package util
 
 import (
-	"os/exec"
+	"errors"
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
-	"errors"
 )
 
 func GetCurrentPath() (string, error) {
@@ -36,4 +37,32 @@ func PathExists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func GetUserPassWord(fp string) (string, string, error) {
+
+	by, err := ioutil.ReadFile(fp)
+	if err != nil {
+		return "", "", err
+	}
+	user := ""
+	pass := ""
+	str := strings.TrimSpace(string(by))
+
+	ps := strings.Split(str, "\n")
+	if len(ps) == 2 {
+		user = strings.Trim(ps[0], "\r")
+		pass = strings.Trim(ps[1], "\r")
+		return user, pass, nil
+	}
+
+	ps = strings.Split(str, "@")
+	if len(ps) > 0 {
+		user = ps[0]
+	}
+	if len(ps) > 1 {
+		pass = ps[1]
+	}
+	return user, pass, nil
+
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/pkg/sftp"
 	"github.com/txthinking/socks5"
+	"github.com/yale8848/deploy/util"
 	"golang.org/x/crypto/ssh"
 	"io"
 	"io/ioutil"
@@ -15,7 +16,6 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
-	"strings"
 )
 
 const maxMaxPacket = 1024 * 10
@@ -44,19 +44,12 @@ func (s *SSHClient) Connect(network string, host string, port int, user string, 
 	}
 
 	if len(userPasswordPath) > 0 {
-		by, err := ioutil.ReadFile(userPasswordPath)
-		if err != nil {
-			return err
+		u, p, er := util.GetUserPassWord(userPasswordPath)
+		if er != nil {
+			return er
 		}
-		str := strings.TrimSpace(string(by))
-
-		ps := strings.Split(str, "@")
-		if len(ps) > 0 {
-			user = ps[0]
-		}
-		if len(ps) > 1 {
-			password = ps[1]
-		}
+		user = u
+		password = p
 	}
 
 	var client *ssh.Client
