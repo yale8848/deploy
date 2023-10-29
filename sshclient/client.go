@@ -186,7 +186,7 @@ func (s *SSHClient) Upload(local string, remoteDir string, callback UploadCallba
 	}
 	defer dstFile.Close()
 
-	buf := make([]byte, 1024*1024)
+	buf := make([]byte, 5*1024*1024)
 
 	var uploaded int64
 	for {
